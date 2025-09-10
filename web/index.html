@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Flutter Web Animated Gradient</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      /* stay behind Flutter */
+      background: linear-gradient(270deg, #ff6b6b, #feca57);
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    const colors = ["#ff6b6b", "#feca57", "#1dd1a1", "#54a0ff"];
+    let step = 0;
+    const bg = document.getElementById("bg");
+
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.substring(1), 16);
+      return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function animateGradient() {
+      // determine indices
+      const idx0 = Math.floor(step) % colors.length;
+      const idx1 = (idx0 + 1) % colors.length;
+
+      // how far between the two colors
+      const t = step % 1;
+
+      // interpolate RGB
+      const c0 = hexToRgb(colors[idx0]);
+      const c1 = hexToRgb(colors[idx1]);
+
+      const r = Math.round(lerp(c0[0], c1[0], t));
+      const g = Math.round(lerp(c0[1], c1[1], t));
+      const b = Math.round(lerp(c0[2], c1[2], t));
+
+      const color1 = `rgb(${r},${g},${b})`;
+
+      // also blend to the next-next color for smoother second stop
+      const idx2 = (idx1 + 1) % colors.length;
+      const c2 = hexToRgb(colors[idx2]);
+      const r2 = Math.round(lerp(c1[0], c2[0], t));
+      const g2 = Math.round(lerp(c1[1], c2[1], t));
+      const b2 = Math.round(lerp(c1[2], c2[2], t));
+      const color2 = `rgb(${r2},${g2},${b2})`;
+
+      bg.style.background = `linear-gradient(270deg, ${color1}, ${color2})`;
+
+      step += 0.003; // smaller = slower, smoother
+      requestAnimationFrame(animateGradient);
+    }
+
+    animateGradient();
+  </script>
+</body>
+
+</html>
